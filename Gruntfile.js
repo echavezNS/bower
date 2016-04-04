@@ -12,9 +12,9 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
 
     grunt.initConfig({
-        jshint: {
+        eslint: {
             options: {
-                jshintrc: '.jshintrc'
+                fix: true
             },
             files: [
                 'Gruntfile.js',
@@ -26,13 +26,6 @@ module.exports = function (grunt) {
                 '!test/sample/**/*',
                 '!test/tmp/**/*'
             ]
-        },
-        jscs: {
-            options: {
-                config: '.jscsrc',
-                fix: true
-            },
-            files: ['<%= jshint.files %>']
         },
         simplemocha: {
             options: {
@@ -50,30 +43,30 @@ module.exports = function (grunt) {
             }
         },
         exec: {
-            assets: {
+            'assets': {
                 command: 'node test/packages.js && node test/packages-svn.js'
             },
             'assets-force': {
                 command: 'node test/packages.js --force && node test/packages-svn.js --force'
             },
-            cover: {
+            'cover': {
                 command: 'node node_modules/istanbul/lib/cli.js cover --dir ./test/reports node_modules/mocha/bin/_mocha -- --timeout 30000 -R dot test/test.js'
             },
-            coveralls: {
+            'coveralls': {
                 command: 'npm run coveralls < test/reports/lcov.info',
-                exitCodes: [0,1,2,3] // Alow for failure for coverage report
+                exitCodes: [0, 1, 2, 3] // Alow for failure for coverage report
             }
         },
         watch: {
-            files: ['<%= jshint.files %>'],
-            tasks: ['jshint', 'simplemocha:short']
+            files: ['<%= eslint.files %>'],
+            tasks: ['eslint', 'simplemocha:short']
         }
     });
 
     grunt.registerTask('assets', ['exec:assets-force']);
-    grunt.registerTask('test', ['jscs', 'jshint', 'exec:assets', 'simplemocha:full']);
+    grunt.registerTask('test', ['eslint', 'exec:assets', 'simplemocha:full']);
     grunt.registerTask('cover', 'exec:cover');
-    grunt.registerTask('travis', ['jshint', 'exec:assets', 'exec:cover', 'exec:coveralls']);
+    grunt.registerTask('travis', ['eslint', 'exec:assets', 'exec:cover', 'exec:coveralls']);
     grunt.registerTask('default', 'test');
 
     grunt.task.registerTask('publish', 'Perform final checks and publish Bower', function () {
